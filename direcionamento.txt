@@ -1,0 +1,17 @@
+1. ler o arquivo xml   Feito
+2. verificar se a leitura ocorreu correta Feito
+3. criar a janela com o retangulo cobrindo ela Falta o retangulo
+4. criar o personagem
+5. mover o personagem nos limites da tela
+6. criar o tiro do personagem
+7. criar o retangulo inimigo e fazer ele mover
+8. criar a colisão do tiro com o retangulo
+9. colocar uma vida no retangulo
+10. criar o inimigo em cima do retangulo
+11. fazer o inimigo mirar no personagem e atirar.
+12. verificar a colisão do tiro e do retangulo.
+13. fazer o jogo acabar se colidir
+14. fazer o jogo acabar se destruir n retangulos
+15. fazer o contador de retangulo
+16. fazer a perna se mover
+17. ajustar pra ter o mesmo tempo (frames) em diferentes computadores. 
