@@ -72,6 +72,20 @@ void Inimigo::MoveEmY(GLfloat dy)
     gY += dy;
 }
 
+GLint Inimigo::GetVida(){
+    return vida;
+}
+
+
+bool Inimigo::Atingido(Tiro *tiro){
+    GLfloat tiroX, tiroY, dist;
+    tiro->GetPos(tiroX, tiroY);
+    if(tiroX >= gX - widht/2 && tiroX <= gX + widht/2 && tiroY >= gY - height/2 && tiroY <= gY + height/2){
+        vida--;
+        return true;
+    }
+    return false;
+}
 
 // Tiro* Inimigo::Atira()
 // {

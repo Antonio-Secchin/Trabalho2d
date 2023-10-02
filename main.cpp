@@ -36,7 +36,7 @@ Player player(0,0,0);
 
 
 //Para teste:
-Inimigo inimigo(0,0,0,0,0,0);
+Inimigo * inimigo = NULL;
 
 Tiro * tiro = NULL;
 
@@ -59,7 +59,8 @@ void renderScene(void)
 
      player.Desenha();
 
-     inimigo.Desenha();
+    if(inimigo)
+        inimigo->Desenha();
      
     if (tiro) tiro->Desenha();
      
@@ -158,7 +159,11 @@ void idle(void)
 
     player.SetAngulo(MouseX,MouseY);
 
-    inimigo.MoveEmY(-inc);
+    if(inimigo){
+        inimigo->MoveEmY(-inc);
+        if(player.Atingido(inimigo))
+            exit(0);
+    }
     
     //Trata o tiro (soh permite um tiro por vez)
     //Poderia usar uma lista para tratar varios tiros
@@ -166,11 +171,16 @@ void idle(void)
         tiro->Move();
 
         //Trata colisao
-        // if (alvo.Atingido(tiro)){
-        //     alvo.Recria(rand()%500 - 250, 200);
-        // }
+        if(inimigo){
+            if (inimigo->Atingido(tiro)){
+                if(inimigo->GetVida() == 0){
+                    inimigo = NULL;
+                }                
+                tiro = NULL;
+            }
+        }
 
-        if (!tiro->Valido()){ 
+        if (tiro && !tiro->Valido()){ 
             delete tiro;
             tiro = NULL;
         }
@@ -211,7 +221,7 @@ int main(int argc, char *argv[])
 
     player = Player(RaioCabecaPer, 0, (-Height/2) + RaioCabecaPer);
 
-    inimigo = Inimigo(0, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril);
+    inimigo = new Inimigo(0, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril);
     
     // Initialize openGL with Double buffer and RGB color without transparency.
     // Its interesting to try GLUT_SINGLE instead of GLUT_DOUBLE.

@@ -3,6 +3,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "tiro.h"
+#include "inimigo.h"
 // Dimensions
 
 class Player {
@@ -37,6 +38,7 @@ public:
     void MoveAngulo(GLfloat da);
     void SetAngulo(GLfloat x, GLfloat y);
     Tiro* Atira();
+    bool Atingido(Inimigo * barril);
     GLfloat ObtemX(){
         return gX;
     };

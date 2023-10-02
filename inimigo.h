@@ -3,6 +3,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdlib.h>
+#include "tiro.h"
 
 
 class Inimigo {
@@ -38,8 +39,15 @@ public:
         DesenhaInimigo(gX, gY, theta);
     };
     void MoveEmY(GLfloat dy);
+    GLint GetVida();
     void Recria(GLfloat x, GLfloat y);
-    //bool Atingido(Tiro *tiro);
+    bool Atingido(Tiro *tiro);
+    GLfloat ObtemX(){
+        return gX;
+    };
+    GLfloat ObtemY(){
+        return gY;
+    };
 };
 
 #endif	/* Inimigo_H */

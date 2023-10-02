@@ -94,15 +94,26 @@ void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yO
 
 Tiro* Player::Atira()
 {  
-    GLfloat x, y, yFinal, xFinal, dx, dy;
+    GLfloat x, y, yFinal, xFinal, xBaseFinal, yBaseFinal,dx, dy;
     x = 0;
     y = 2* radiusHead;
     RotatePoint(x, y, gTheta, xFinal, yFinal);
-    dx = x - xFinal;
-    dy = y - yFinal;
-    xFinal = xFinal + 1.25 * radiusHead + gX;
+    RotatePoint(0, 0, gTheta, xBaseFinal, yBaseFinal);
+    xFinal = xFinal + 1.125 * radiusHead + gX;
     yFinal = yFinal + gY;
-
+    xBaseFinal = xBaseFinal + 1.125 * radiusHead + gX;
+    yBaseFinal = yBaseFinal + gY;
+    dx = xFinal -xBaseFinal;
+    dy = yFinal - yBaseFinal;
     Tiro * disparo = new Tiro(xFinal, yFinal, atan2(dy,dx));
     return disparo;
+}
+
+bool Player::Atingido(Inimigo * barril){
+    GLfloat dist;
+    dist = (barril->ObtemX() - gX) * (barril->ObtemX() - gX) + (barril->ObtemY() - gY) * (barril->ObtemY() - gY); 
+    if(dist <= radiusHead * radiusHead){
+        return true;
+    }
+    return false;
 }
