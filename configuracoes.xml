@@ -1,7 +1,7 @@
 <jogo>
-  <arena  altura="500" largura="200"/>
+  <arena  altura="500" largura="700"/>
   <jogador raioCabeca="50" velocidade="..."/>
   <inimigo raioCabeca="50" tirosPorSegundo="..." velocidadeTiro="..."/>
-  <barril altura="..." largura="..." numeroTiros="..." nParaGanhar="..." velocidade="..."/>
+  <barril altura="100" largura="100" numeroTiros="..." nParaGanhar="..." velocidade="..."/>
   <outros pensar="..." emAlgo="..."/>
 </jogo>
