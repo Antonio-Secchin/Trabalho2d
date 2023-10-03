@@ -46,10 +46,7 @@ void passiveMotion(int x, int y){
 
     MouseX = x - Width/2;
     MouseY = Height/2 - y;
-    //printf("%f %f\n", MouseX, MouseY);
-    // player.SetAngulo(x,y);
 
-    // glutPostRedisplay();
 }
 
 void renderScene(void)
@@ -64,6 +61,9 @@ void renderScene(void)
     if(inimigo)
         inimigo->Desenha();
      
+     if(tiroIni)
+        tiroIni->Desenha();
+
     if (tiro) tiro->Desenha();
      
      //alvo.Desenha();
@@ -163,14 +163,14 @@ void idle(void)
 
     if(inimigo){
         //inimigo->MoveEmY(-inc);
-        if(inimigo->SetAngulo(player.ObtemX(), player.ObtemY()))
+        if(inimigo->SetAngulo(player.ObtemX(), player.ObtemY()) && !tiroIni){
             tiroIni = inimigo->Atira();
+        }
         if(player.Atingido(inimigo))
             exit(0);
     }
     if(tiroIni)
         tiroIni->Move();
-    //Trata o tiro (soh permite um tiro por vez)
     //Poderia usar uma lista para tratar varios tiros
     if(tiro){
         tiro->Move();
@@ -188,6 +188,10 @@ void idle(void)
         if (tiro && !tiro->Valido()){ 
             delete tiro;
             tiro = NULL;
+        }
+        if (tiroIni && !tiroIni->Valido()){ 
+            delete tiroIni;
+            tiroIni = NULL;
         }
     }
     

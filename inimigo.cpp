@@ -113,7 +113,7 @@ Tiro* Inimigo::Atira()
 {
     GLfloat x, y, yFinal, xFinal, xBaseFinal, yBaseFinal,dx, dy;
     x = 0;
-    y = 2* radiusHead;
+    y = -2* radiusHead;
     RotatePoint(x, y, gTheta, xFinal, yFinal);
     RotatePoint(0, 0, gTheta, xBaseFinal, yBaseFinal);
     xFinal = xFinal + 1.125 * radiusHead + gX;
