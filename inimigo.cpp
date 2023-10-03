@@ -1,5 +1,6 @@
 #include "inimigo.h"
 #include <math.h>
+#include <stdio.h>
 
 void Inimigo::DesenhaRect(GLint height, GLint width, GLfloat R, GLfloat G, GLfloat B)
 {
@@ -32,6 +33,7 @@ void Inimigo::DesenhaArma(GLfloat x, GLfloat y)
 {
     glPushMatrix();
     glTranslatef(x,y,0);
+    glRotatef(gTheta, 0, 0, 1);
     DesenhaRect(-2*radiusHead, radiusHead/4, 1, 0, 0);
     glPopMatrix();
 }
@@ -87,7 +89,39 @@ bool Inimigo::Atingido(Tiro *tiro){
     return false;
 }
 
-// Tiro* Inimigo::Atira()
-// {
+static void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yOut){
+    GLfloat angleRad = 2 * M_PI * angle / 360;
+    xOut = x * cos(angleRad) - y * sin(angleRad);
+    yOut = x * sin(angleRad) + y * cos(angleRad);
+}
 
-// }
+bool Inimigo::SetAngulo(GLfloat x, GLfloat y){
+    GLfloat dx,dy, angulo;
+    dx = -(x - gX - 1.25 * radiusHead);
+    dy = -(y - gY + 2* radiusHead);
+    angulo = atan2(dy,dx) * (180.0 / M_PI);
+    //printf("%f\n", angulo);
+    if(angulo >= 60 && angulo <= 120){
+        gTheta = angulo - 90;
+        //printf("%f\n",gTheta);
+        return true;
+    }
+    return false;
+}
+
+Tiro* Inimigo::Atira()
+{
+    GLfloat x, y, yFinal, xFinal, xBaseFinal, yBaseFinal,dx, dy;
+    x = 0;
+    y = 2* radiusHead;
+    RotatePoint(x, y, gTheta, xFinal, yFinal);
+    RotatePoint(0, 0, gTheta, xBaseFinal, yBaseFinal);
+    xFinal = xFinal + 1.125 * radiusHead + gX;
+    yFinal = yFinal + gY;
+    xBaseFinal = xBaseFinal + 1.125 * radiusHead + gX;
+    yBaseFinal = yBaseFinal + gY;
+    dx = xFinal -xBaseFinal;
+    dy = yFinal - yBaseFinal;
+    Tiro * disparo = new Tiro(xFinal, yFinal, atan2(dy,dx));
+    return disparo;
+}

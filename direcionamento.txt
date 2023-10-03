@@ -3,13 +3,13 @@
 3. criar a janela com o retangulo cobrindo ela Falta o retangulo  \Feito
 4. criar o personagem  \\Feito
 5. mover o personagem nos limites da tela \\Feito
-6. criar o tiro do personagem
-7. criar o retangulo inimigo e fazer ele mover
-8. criar a colisão do tiro com o retangulo
-9. colocar uma vida no retangulo
-10. criar o inimigo em cima do retangulo
+6. criar o tiro do personagem \\Feito
+7. criar o retangulo inimigo e fazer ele mover \\Feito
+8. criar a colisão do tiro com o retangulo \\Feito
+9. colocar uma vida no retangulo \\Feito
+10. criar o inimigo em cima do retangulo \\Feito
 11. fazer o inimigo mirar no personagem e atirar.  \\Vetor entre inimigo e personagem  \\lista de tiros
-12. verificar a colisão do tiro e do retangulo.
+12. verificar a colisão do tiro e do retangulo.  \\Feito a do retangulo
 13. fazer o jogo acabar se colidir
 14. fazer o jogo acabar se destruir n retangulos
 15. fazer o contador de retangulo

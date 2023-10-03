@@ -86,7 +86,7 @@ void Player::SetAngulo(GLfloat x, GLfloat y){
 }
 
 //Funcao auxiliar de rotacao
-void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yOut){
+static void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yOut){
     GLfloat angleRad = 2 * M_PI * angle / 360;
     xOut = x * cos(angleRad) - y * sin(angleRad);
     yOut = x * sin(angleRad) + y * cos(angleRad);
@@ -110,8 +110,24 @@ Tiro* Player::Atira()
 }
 
 bool Player::Atingido(Inimigo * barril){
-    GLfloat dist;
-    dist = (barril->ObtemX() - gX) * (barril->ObtemX() - gX) + (barril->ObtemY() - gY) * (barril->ObtemY() - gY); 
+    GLfloat dist, dX, dY, xMin, yMin;
+    dX = abs(gX - barril->ObtemX());
+    dY = abs(gY - barril->ObtemY());
+    if(gX < barril->ObtemX() - barril->ObtemWidht()/2)
+        xMin = barril->ObtemX() - barril->ObtemWidht()/2;
+    else if(gX > barril->ObtemX() + barril->ObtemWidht()/2)
+        xMin = barril->ObtemX() + barril->ObtemWidht()/2;
+    else 
+        xMin = gX;
+
+    if(gY < barril->ObtemY() - barril->ObtemHeight()/2)
+        yMin = barril->ObtemY() - barril->ObtemHeight()/2;
+    else if(gY > barril->ObtemY() + barril->ObtemHeight()/2)
+        yMin = barril->ObtemY() + barril->ObtemHeight()/2;
+    else 
+        yMin = gY;
+
+    dist = (xMin - gX) * (xMin - gX) + (yMin - gY) * (yMin - gY); 
     if(dist <= radiusHead * radiusHead){
         return true;
     }

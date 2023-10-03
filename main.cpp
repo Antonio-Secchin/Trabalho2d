@@ -40,6 +40,8 @@ Inimigo * inimigo = NULL;
 
 Tiro * tiro = NULL;
 
+Tiro * tiroIni = NULL;
+
 void passiveMotion(int x, int y){
 
     MouseX = x - Width/2;
@@ -160,11 +162,14 @@ void idle(void)
     player.SetAngulo(MouseX,MouseY);
 
     if(inimigo){
-        inimigo->MoveEmY(-inc);
+        //inimigo->MoveEmY(-inc);
+        if(inimigo->SetAngulo(player.ObtemX(), player.ObtemY()))
+            tiroIni = inimigo->Atira();
         if(player.Atingido(inimigo))
             exit(0);
     }
-    
+    if(tiroIni)
+        tiroIni->Move();
     //Trata o tiro (soh permite um tiro por vez)
     //Poderia usar uma lista para tratar varios tiros
     if(tiro){

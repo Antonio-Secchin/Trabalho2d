@@ -9,7 +9,7 @@
 class Inimigo {
     GLfloat gX; 
     GLfloat gY;
-    GLfloat theta;
+    GLfloat gTheta;
     GLfloat widht;
     GLfloat height;
     GLint radiusHead;
@@ -36,12 +36,20 @@ public:
         hasSniper = rand()%2;
     };
     void Desenha(){ 
-        DesenhaInimigo(gX, gY, theta);
+        DesenhaInimigo(gX, gY, gTheta);
     };
     void MoveEmY(GLfloat dy);
     GLint GetVida();
     void Recria(GLfloat x, GLfloat y);
+    bool SetAngulo(GLfloat x, GLfloat y);
+    Tiro* Atira();
     bool Atingido(Tiro *tiro);
+    GLfloat ObtemWidht(){
+        return widht;
+    };
+    GLfloat ObtemHeight(){
+        return height;
+    };
     GLfloat ObtemX(){
         return gX;
     };
