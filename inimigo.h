@@ -16,6 +16,7 @@ class Inimigo {
     GLint vida;
     int gColor;
     int hasSniper;
+    GLfloat velocidadeTiro;
 private:
     void DesenhaCirc(GLint radius, GLfloat R, GLfloat G, GLfloat B);
     void DesenhaRect(  GLint height, GLint width, 
@@ -25,7 +26,7 @@ private:
     void DesenhaBarril();
     void DesenhaInimigo(GLfloat x, GLfloat y, GLfloat theta);
 public:
-    Inimigo(GLfloat x, GLfloat y, GLfloat radiusIni, GLint vidamax, GLfloat widhtRet, GLfloat heightRet){
+    Inimigo(GLfloat x, GLfloat y, GLfloat radiusIni, GLint vidamax, GLfloat widhtRet, GLfloat heightRet, GLfloat veloTiro){
         gX = x; 
         gY = y;
         gColor = 0;
@@ -34,6 +35,7 @@ public:
         widht = widhtRet;
         height = heightRet;
         hasSniper = rand()%2;
+        velocidadeTiro = veloTiro;
     };
     void Desenha(){ 
         DesenhaInimigo(gX, gY, gTheta);

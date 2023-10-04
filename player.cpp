@@ -105,11 +105,11 @@ Tiro* Player::Atira()
     yBaseFinal = yBaseFinal + gY;
     dx = xFinal -xBaseFinal;
     dy = yFinal - yBaseFinal;
-    Tiro * disparo = new Tiro(xFinal, yFinal, atan2(dy,dx));
+    Tiro * disparo = new Tiro(xFinal, yFinal, atan2(dy,dx), 0.5);
     return disparo;
 }
 
-bool Player::Atingido(Inimigo * barril){
+bool Player::AtingidoBarril(Inimigo * barril){
     GLfloat dist, dX, dY, xMin, yMin;
     dX = abs(gX - barril->ObtemX());
     dY = abs(gY - barril->ObtemY());
@@ -133,3 +133,15 @@ bool Player::Atingido(Inimigo * barril){
     }
     return false;
 }
+
+bool Player::AtingidoTiro(Tiro *tiro)
+{
+    GLfloat tiroX, tiroY, dist;
+    tiro->GetPos(tiroX, tiroY);
+    dist = (tiroX - gX) * (tiroX - gX) + (tiroY - gY) * (tiroY - gY); 
+    if(dist <= radiusHead*radiusHead){
+        return true;
+    }
+    return false;
+}
+

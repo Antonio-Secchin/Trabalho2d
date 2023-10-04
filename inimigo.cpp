@@ -122,6 +122,6 @@ Tiro* Inimigo::Atira()
     yBaseFinal = yBaseFinal + gY;
     dx = xFinal -xBaseFinal;
     dy = yFinal - yBaseFinal;
-    Tiro * disparo = new Tiro(xFinal, yFinal, atan2(dy,dx));
+    Tiro * disparo = new Tiro(xFinal, yFinal, atan2(dy,dx), velocidadeTiro);
     return disparo;
 }

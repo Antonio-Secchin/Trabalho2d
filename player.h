@@ -38,7 +38,8 @@ public:
     void MoveAngulo(GLfloat da);
     void SetAngulo(GLfloat x, GLfloat y);
     Tiro* Atira();
-    bool Atingido(Inimigo * barril);
+    bool AtingidoBarril(Inimigo * barril);
+    bool AtingidoTiro(Tiro * tiro);
     GLfloat ObtemX(){
         return gX;
     };

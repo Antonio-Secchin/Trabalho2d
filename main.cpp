@@ -20,10 +20,19 @@ GLfloat MouseX = 0, MouseY = 0;
 // Window dimensions
 GLint Width;
 GLint Height;
+
+
 GLint WidthBarril;
 GLint HeightBarril;
 GLint RaioCabecaPer;
 GLint RaioCabecaIni;
+GLfloat VelocidadeTiroIni;
+
+static char str[1000];
+int BarrilNec;
+void * font = GLUT_BITMAP_9_BY_15;
+
+bool Perdeu = false;
 
 // Viewing dimensions
 const GLint ViewingWidth = 500;
@@ -42,6 +51,54 @@ Tiro * tiro = NULL;
 
 Tiro * tiroIni = NULL;
 
+void ImprimeBarrilNec(GLfloat x, GLfloat y)
+{
+    glColor3f(1.0, 1.0, 1.0);
+    //Cria a string a ser impressa
+    char *tmpStr;
+    sprintf(str, "Barris: %d", BarrilNec );
+    //Define a posicao onde vai comecar a imprimir
+    glRasterPos2f(x, y);
+    //Imprime um caractere por vez
+    tmpStr = str;
+    while( *tmpStr ){
+        glutBitmapCharacter(font, *tmpStr);
+        tmpStr++;
+    }
+}
+
+void ImprimeVitoria(GLfloat x, GLfloat y)
+{
+    glColor3f(1.0, 1.0, 1.0);
+    //Cria a string a ser impressa
+    char *tmpStr;
+    sprintf(str, "Voce ganhou!!!!");
+    //Define a posicao onde vai comecar a imprimir
+    glRasterPos2f(x, y);
+    //Imprime um caractere por vez
+    tmpStr = str;
+    while( *tmpStr ){
+        glutBitmapCharacter(font, *tmpStr);
+        tmpStr++;
+    }
+}
+
+void ImprimeDerrota(GLfloat x, GLfloat y)
+{
+    glColor3f(1.0, 1.0, 1.0);
+    //Cria a string a ser impressa
+    char *tmpStr;
+    sprintf(str, "Voce Perdeu :( :( :(");
+    //Define a posicao onde vai comecar a imprimir
+    glRasterPos2f(x, y);
+    //Imprime um caractere por vez
+    tmpStr = str;
+    while( *tmpStr ){
+        glutBitmapCharacter(font, *tmpStr);
+        tmpStr++;
+    }
+}
+
 void passiveMotion(int x, int y){
 
     MouseX = x - Width/2;
@@ -49,14 +106,27 @@ void passiveMotion(int x, int y){
 
 }
 
+
 void renderScene(void)
 {
-     // Clear the screen.
-     glClear(GL_COLOR_BUFFER_BIT);
+    // Clear the screen.
+    glClear(GL_COLOR_BUFFER_BIT);
  
      arena.Desenha();
 
-     player.Desenha();
+    if(BarrilNec == 0){
+        ImprimeVitoria(-60,0);
+        glutSwapBuffers();
+        return;
+    }
+
+    if(Perdeu){
+        ImprimeDerrota(-60,0);
+        glutSwapBuffers();
+        return;
+     }
+
+    player.Desenha();
 
     if(inimigo)
         inimigo->Desenha();
@@ -65,11 +135,14 @@ void renderScene(void)
         tiroIni->Desenha();
 
     if (tiro) tiro->Desenha();
+
+    ImprimeBarrilNec(Width/2 -100, Height/2 - 15);
      
      //alvo.Desenha();
 
      glutSwapBuffers(); // Desenha the new frame of the game.
 }
+
 
 void keyPress(unsigned char key, int x, int y)
 {
@@ -91,15 +164,12 @@ void keyPress(unsigned char key, int x, int y)
         case 'S':
              keyStatus[(int)('s')] = 1; //Using keyStatus trick
              break;
-        case ' ':
-             if (!tiro)
-                tiro = player.Atira();
-            break;
         case 27 :
              exit(0);
     }
     glutPostRedisplay();
 }
+
 
 void keyup(unsigned char key, int x, int y)
 {
@@ -107,12 +177,26 @@ void keyup(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
+
 void ResetKeyStatus()
 {
     int i;
     //Initialize keyStatus
     for(i = 0; i < 256; i++)
        keyStatus[i] = 0; 
+}
+
+
+void mouse(int button, int state, int x, int y){
+    //Corrige a posicao do mouse para a posicao da janela de visualizacao
+
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+        if (!tiro){
+                tiro = player.Atira();
+                tiro->SetLimite(Height,Width);
+             }
+    }
+
 }
 
 
@@ -135,50 +219,73 @@ void init(void)
       
 }
 
+
+
 void idle(void)
 {    
+    static GLdouble previousTime = glutGet(GLUT_ELAPSED_TIME);
+    GLdouble currentTime, timeDiference;
+    //Pega o tempo que passou do inicio da aplicacao
+    currentTime = glutGet(GLUT_ELAPSED_TIME);
+    // Calcula o tempo decorrido desde de a ultima frame.
+    timeDiference = currentTime - previousTime;
+    //Atualiza o tempo do ultimo frame ocorrido
+    previousTime = currentTime;
+    //for(int i = 0; i < 90000000; i++);
+
     double inc = INC_KEYIDLE;
     //Treat keyPress
     if(keyStatus[(int)('a')] && player.ObtemX() - RaioCabecaPer > -Width/2)
     {
-        player.MoveEmX(-inc);
+        player.MoveEmX(-inc * timeDiference);
         //player.MoveAngulo(-inc);
     }
     if(keyStatus[(int)('d')] && player.ObtemX() + RaioCabecaPer < Width/2)
     {
-        player.MoveEmX(inc);
+        player.MoveEmX(inc * timeDiference);
         //player.MoveAngulo(inc);
     }
 
     if(keyStatus[(int)('s')] && player.ObtemY() - RaioCabecaPer > -Height/2)
     {
-        player.MoveEmY(-inc);
+        player.MoveEmY(-inc * timeDiference);
     }
     if(keyStatus[(int)('w')] && player.ObtemY() + RaioCabecaPer < 0)
     {
-        player.MoveEmY(inc);
+        player.MoveEmY(inc * timeDiference);
     }
 
     player.SetAngulo(MouseX,MouseY);
 
     if(inimigo){
-        //inimigo->MoveEmY(-inc);
+        inimigo->MoveEmY(-inc * timeDiference);
         if(inimigo->SetAngulo(player.ObtemX(), player.ObtemY()) && !tiroIni){
             tiroIni = inimigo->Atira();
+            tiroIni->SetLimite(Height,Width);
         }
-        if(player.Atingido(inimigo))
-            exit(0);
+        if(player.AtingidoBarril(inimigo))
+            Perdeu = true;
     }
-    if(tiroIni)
-        tiroIni->Move();
+    if(tiroIni){
+        tiroIni->Move(timeDiference);
+        if(player.AtingidoTiro(tiroIni)){
+            Perdeu = true;
+        }
+        if (tiroIni && !tiroIni->Valido()){ 
+            delete tiroIni;
+            tiroIni = NULL;
+        }
+    }
     //Poderia usar uma lista para tratar varios tiros
     if(tiro){
-        tiro->Move();
+        tiro->Move(timeDiference);
 
         //Trata colisao
         if(inimigo){
             if (inimigo->Atingido(tiro)){
                 if(inimigo->GetVida() == 0){
+                    BarrilNec--;
+                    delete(inimigo);
                     inimigo = NULL;
                 }                
                 tiro = NULL;
@@ -188,10 +295,6 @@ void idle(void)
         if (tiro && !tiro->Valido()){ 
             delete tiro;
             tiro = NULL;
-        }
-        if (tiroIni && !tiroIni->Valido()){ 
-            delete tiroIni;
-            tiroIni = NULL;
         }
     }
     
@@ -215,11 +318,14 @@ int main(int argc, char *argv[])
         }
         if(jogador)
             RaioCabecaPer = atoi(jogador->Attribute("raioCabeca"));
-        if(inimigo)
+        if(inimigo){
             RaioCabecaIni = atoi(inimigo->Attribute("raioCabeca"));
+            VelocidadeTiroIni = (GLfloat)atoi(inimigo->Attribute("velocidadeTiro"))/100;
+        }
         if(barril){
             HeightBarril = atoi(barril->Attribute("altura"));
             WidthBarril = atoi(barril->Attribute("largura"));
+            BarrilNec = atoi(barril->Attribute("nParaGanhar"));
         }
     }
     } else {
@@ -230,7 +336,7 @@ int main(int argc, char *argv[])
 
     player = Player(RaioCabecaPer, 0, (-Height/2) + RaioCabecaPer);
 
-    inimigo = new Inimigo(0, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril);
+    inimigo = new Inimigo(0, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni);
     
     // Initialize openGL with Double buffer and RGB color without transparency.
     // Its interesting to try GLUT_SINGLE instead of GLUT_DOUBLE.
@@ -241,6 +347,7 @@ int main(int argc, char *argv[])
     glutInitWindowSize(Width, Height);
     glutInitWindowPosition(150,50);
     glutCreateWindow("Trabalho 2D");
+    glutMouseFunc(mouse);
     glutPassiveMotionFunc(passiveMotion);
  
     // Define callbacks.
