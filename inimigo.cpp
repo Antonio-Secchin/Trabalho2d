@@ -63,7 +63,7 @@ void Inimigo::DesenhaInimigo(GLfloat x, GLfloat y, GLfloat theta)
     DesenhaBarril();
     if(hasSniper){
         DesenhaPernas(radiusHead, 0);
-        DesenhaCirc(radiusHead, 0, 1, 0);
+        DesenhaCirc(radiusHead, 0.5, 0, 0.5);
         DesenhaArma(radiusHead, 0);
     }
     glPopMatrix();

@@ -4,12 +4,17 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <iostream>
+#include <list>
 #include "tinyxml.h"
 #include "arena.h"
 #include "player.h"
 #include "inimigo.h"
 #define INC_KEY 1
 #define INC_KEYIDLE 0.1
+
+
+using namespace std;
 
 
 //Key status
@@ -30,6 +35,7 @@ GLfloat VelocidadeTiroIni;
 
 static char str[1000];
 int BarrilNec;
+GLdouble contSpawnIni = 0;
 void * font = GLUT_BITMAP_9_BY_15;
 
 bool Perdeu = false;
@@ -43,9 +49,10 @@ Arena arena(0,0);
 
 Player player(0,0,0);
 
+list<Inimigo*> listaEnemy{};
 
 //Para teste:
-Inimigo * inimigo = NULL;
+//Inimigo * inimigo = NULL;
 
 Tiro * tiro = NULL;
 
@@ -115,6 +122,25 @@ void renderScene(void)
      arena.Desenha();
 
     if(BarrilNec == 0){
+        // Criar um iterador para percorrer a lista
+        auto inicio = listaEnemy.begin();
+        
+        if(tiro){
+            delete tiro;
+        }
+        if(tiroIni){
+            delete tiro;
+        }
+
+        // Percorrer a lista com um loop while
+        while (inicio != listaEnemy.end()) {
+            Inimigo* inimigo = *inicio;
+            ++inicio;
+            listaEnemy.remove(inimigo);
+            delete inimigo;
+        }
+
+            
         ImprimeVitoria(-60,0);
         glutSwapBuffers();
         return;
@@ -124,15 +150,19 @@ void renderScene(void)
         ImprimeDerrota(-60,0);
         glutSwapBuffers();
         return;
-     }
+    }
 
     player.Desenha();
 
-    if(inimigo)
-        inimigo->Desenha();
+    if (!listaEnemy.empty()) {
+        for(Inimigo * inimigo :  listaEnemy){
+            if(inimigo){
+                inimigo->Desenha();
+            }
+        }
+    }
      
-     if(tiroIni)
-        tiroIni->Desenha();
+     if(tiroIni) tiroIni->Desenha();
 
     if (tiro) tiro->Desenha();
 
@@ -234,6 +264,14 @@ void idle(void)
     //for(int i = 0; i < 90000000; i++);
 
     double inc = INC_KEYIDLE;
+
+    contSpawnIni += inc*timeDiference;
+
+    if(contSpawnIni>=HeightBarril * 1.5){
+        contSpawnIni = 0;
+        listaEnemy.push_back(new Inimigo(rand()%(Width - WidthBarril/2) - Width/2, Height/2 - HeightBarril/2, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni));
+    }
+
     //Treat keyPress
     if(keyStatus[(int)('a')] && player.ObtemX() - RaioCabecaPer > -Width/2)
     {
@@ -257,15 +295,20 @@ void idle(void)
 
     player.SetAngulo(MouseX,MouseY);
 
-    if(inimigo){
-        inimigo->MoveEmY(-inc * timeDiference);
-        if(inimigo->SetAngulo(player.ObtemX(), player.ObtemY()) && !tiroIni){
-            tiroIni = inimigo->Atira();
-            tiroIni->SetLimite(Height,Width);
+    if (!listaEnemy.empty()) {
+        for(Inimigo * inimigo :  listaEnemy){
+            if(inimigo){
+                inimigo->MoveEmY(-inc * timeDiference);
+                if(inimigo->HasSniper() && inimigo->SetAngulo(player.ObtemX(), player.ObtemY()) && !tiroIni){
+                    tiroIni = inimigo->Atira();
+                    tiroIni->SetLimite(Height,Width);
+                }
+                if(player.AtingidoBarril(inimigo))
+                    Perdeu = true;
+            }
         }
-        if(player.AtingidoBarril(inimigo))
-            Perdeu = true;
     }
+
     if(tiroIni){
         tiroIni->Move(timeDiference);
         if(player.AtingidoTiro(tiroIni)){
@@ -281,14 +324,22 @@ void idle(void)
         tiro->Move(timeDiference);
 
         //Trata colisao
-        if(inimigo){
-            if (inimigo->Atingido(tiro)){
-                if(inimigo->GetVida() == 0){
-                    BarrilNec--;
-                    delete(inimigo);
-                    inimigo = NULL;
-                }                
-                tiro = NULL;
+        if (!listaEnemy.empty()) {
+            for(Inimigo * inimigo :  listaEnemy){
+                if(inimigo){
+                    if (tiro && inimigo->Atingido(tiro)){
+                        if(inimigo->GetVida() == 0){
+                            BarrilNec--;
+                            listaEnemy.remove(inimigo);
+                            delete inimigo;
+                            inimigo = NULL;
+                            break;
+                        }
+                        delete tiro;                
+                        tiro = NULL;
+                        break;
+                    }
+                }
             }
         }
 
@@ -336,7 +387,10 @@ int main(int argc, char *argv[])
 
     player = Player(RaioCabecaPer, 0, (-Height/2) + RaioCabecaPer);
 
-    inimigo = new Inimigo(0, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni);
+    //listaEnemy.push_front(new Inimigo(0, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni));
+
+    //listaEnemy.push_front(new Inimigo(200, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni));
+
     
     // Initialize openGL with Double buffer and RGB color without transparency.
     // Its interesting to try GLUT_SINGLE instead of GLUT_DOUBLE.

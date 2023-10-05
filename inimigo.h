@@ -58,6 +58,9 @@ public:
     GLfloat ObtemY(){
         return gY;
     };
+    int HasSniper(){
+        return hasSniper;
+    };
 };
 
 #endif	/* Inimigo_H */
