@@ -125,12 +125,12 @@ void renderScene(void)
         // Criar um iterador para percorrer a lista
         auto inicio = listaEnemy.begin();
         
-        if(tiro){
-            delete tiro;
-        }
-        if(tiroIni){
-            delete tiro;
-        }
+        // if(tiro){
+        //     delete tiro;
+        // }
+        // if(tiroIni){
+        //     delete tiro;
+        // }
 
         // Percorrer a lista com um loop while
         while (inicio != listaEnemy.end()) {

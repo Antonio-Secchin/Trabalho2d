@@ -66,6 +66,26 @@ void Inimigo::DesenhaInimigo(GLfloat x, GLfloat y, GLfloat theta)
         DesenhaCirc(radiusHead, 0.5, 0, 0.5);
         DesenhaArma(radiusHead, 0);
     }
+    DesenhaVida(widht/2 - 20, 0, 0, 0, 0);
+    glPopMatrix();
+}
+
+void Inimigo::DesenhaVida(GLint x, GLint y, GLfloat R, GLfloat G, GLfloat B){
+    glPushMatrix();
+    glTranslatef(x,y,0);
+    void * font = GLUT_BITMAP_9_BY_15;
+    char *tmpStr;
+    char str[1000];
+    glColor3f(R, G, B);
+    sprintf(str, "%d", vida);
+    //Define a posicao onde vai comecar a imprimir
+    glRasterPos2f(0, 0);
+    tmpStr = str;
+    //Imprime um caractere por vez
+    while( *tmpStr ){
+        glutBitmapCharacter(font, *tmpStr);
+        tmpStr++;
+    }
     glPopMatrix();
 }
 
