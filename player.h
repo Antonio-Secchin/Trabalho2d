@@ -9,7 +9,8 @@
 class Player {
     GLfloat gX; 
     GLfloat gY; 
-    GLfloat gTheta; 
+    GLfloat gTheta;
+    GLint gThetaPerna; 
     GLfloat direction;
     GLfloat radiusHead;
 
@@ -29,6 +30,7 @@ public:
         gX = gXP; 
         gY = gYP; 
         gTheta = 0;
+        gThetaPerna = 0;
     };
     void Desenha(){ 
         DesenhaPlayer(gX, gY, gTheta);

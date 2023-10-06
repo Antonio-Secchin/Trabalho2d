@@ -18,6 +18,7 @@ class Inimigo {
     int gColor;
     int hasSniper;
     GLfloat velocidadeTiro;
+    GLdouble cooldownTiro;
 private:
     void DesenhaCirc(GLint radius, GLfloat R, GLfloat G, GLfloat B);
     void DesenhaRect(GLint height, GLint width, 
@@ -39,6 +40,7 @@ public:
         height = heightRet;
         hasSniper = rand()%2;
         velocidadeTiro = veloTiro;
+        cooldownTiro = 0;
     };
     void Desenha(){ 
         DesenhaInimigo(gX, gY, gTheta);
@@ -64,6 +66,15 @@ public:
     int HasSniper(){
         return hasSniper;
     };
+    GLdouble ObtemCooldownTiro(){
+        return cooldownTiro;
+    };
+    void IncrementaCooldownTiro(GLdouble inc){
+        cooldownTiro += inc;
+    };
+    void ReiniciaCooldownTiro(){
+        cooldownTiro = 0;
+    }
 };
 
 #endif	/* Inimigo_H */

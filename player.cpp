@@ -42,8 +42,11 @@ void Player::DesenhaPernas(GLfloat x, GLfloat y)
 {
     glPushMatrix();
     glTranslatef(x,y,0);
+    glRotatef(gThetaPerna, 1, 0, 0);
     DesenhaRect(1.2 * radiusHead, - radiusHead/4, 0, 0, 0);
+    glRotatef(-gThetaPerna, 1, 0, 0);
     glTranslatef(-2*x,y,0);
+    glRotatef(gThetaPerna, 1, 0, 0);
     DesenhaRect(-1.2 * radiusHead, radiusHead/4, 0, 0, 0);
     glPopMatrix();
 }
@@ -66,6 +69,10 @@ void Player::MoveEmX(GLfloat dx)
 void Player::MoveEmY(GLfloat dy)
 {
     gY += dy;
+    if(dy > 0)
+        gThetaPerna = (gThetaPerna + 1)%180;
+    if(dy < 0)
+        gThetaPerna = (gThetaPerna - 1)%180;
 }
 
 void Player::MoveAngulo(GLfloat da){

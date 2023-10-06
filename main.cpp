@@ -54,9 +54,11 @@ list<Inimigo*> listaEnemy{};
 //Para teste:
 //Inimigo * inimigo = NULL;
 
+list<Tiro*> listaTiroEnemy{};
+
 Tiro * tiro = NULL;
 
-Tiro * tiroIni = NULL;
+//Tiro * tiroIni = NULL;
 
 void ImprimeBarrilNec(GLfloat x, GLfloat y)
 {
@@ -124,13 +126,6 @@ void renderScene(void)
     if(BarrilNec == 0){
         // Criar um iterador para percorrer a lista
         auto inicio = listaEnemy.begin();
-        
-        // if(tiro){
-        //     delete tiro;
-        // }
-        // if(tiroIni){
-        //     delete tiro;
-        // }
 
         // Percorrer a lista com um loop while
         while (inicio != listaEnemy.end()) {
@@ -161,8 +156,12 @@ void renderScene(void)
             }
         }
     }
-     
-     if(tiroIni) tiroIni->Desenha();
+    
+    if (!listaEnemy.empty()) {
+        for(Tiro * tiroIni :  listaTiroEnemy){
+            if(tiroIni) tiroIni->Desenha();
+        }
+    }
 
     if (tiro) tiro->Desenha();
 
@@ -269,7 +268,7 @@ void idle(void)
 
     if(contSpawnIni>=HeightBarril * 1.5){
         contSpawnIni = 0;
-        listaEnemy.push_back(new Inimigo(rand()%(Width - WidthBarril/2) - Width/2, Height/2 - HeightBarril/2, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni));
+        //listaEnemy.push_back(new Inimigo(rand()%(Width - WidthBarril/2) - Width/2, Height/2 - HeightBarril/2, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni));
     }
 
     //Treat keyPress
@@ -299,9 +298,12 @@ void idle(void)
         for(Inimigo * inimigo :  listaEnemy){
             if(inimigo){
                 inimigo->MoveEmY(-inc * timeDiference);
-                if(inimigo->HasSniper() && inimigo->SetAngulo(player.ObtemX(), player.ObtemY()) && !tiroIni){
-                    tiroIni = inimigo->Atira();
+                inimigo->IncrementaCooldownTiro(timeDiference);
+                if(inimigo->HasSniper() && inimigo->SetAngulo(player.ObtemX(), player.ObtemY()) && inimigo->ObtemCooldownTiro()>1200){
+                    Tiro * tiroIni = inimigo->Atira();
                     tiroIni->SetLimite(Height,Width);
+                    listaTiroEnemy.push_back(tiroIni);
+                    inimigo->ReiniciaCooldownTiro();
                 }
                 if(player.AtingidoBarril(inimigo))
                     Perdeu = true;
@@ -309,14 +311,28 @@ void idle(void)
         }
     }
 
-    if(tiroIni){
-        tiroIni->Move(timeDiference);
-        if(player.AtingidoTiro(tiroIni)){
-            Perdeu = true;
+    if (!listaEnemy.empty()) {
+        list<Tiro*> aux{};
+        for(Tiro * tiroIni :  listaTiroEnemy){
+            if(tiroIni){
+                tiroIni->Move(timeDiference);
+                if(player.AtingidoTiro(tiroIni)){
+                    Perdeu = true;
+                    break;
+                }
+                if (tiroIni && !tiroIni->Valido()){ 
+                    aux.push_back(tiroIni);
+                }
+            }
         }
-        if (tiroIni && !tiroIni->Valido()){ 
+        auto inicio = aux.begin();
+
+        // Percorrer a lista com um loop while
+        while (inicio != aux.end()) {
+            Tiro* tiroIni = *inicio;
+            ++inicio;
+            listaTiroEnemy.remove(tiroIni);
             delete tiroIni;
-            tiroIni = NULL;
         }
     }
     //Poderia usar uma lista para tratar varios tiros
