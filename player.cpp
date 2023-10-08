@@ -70,16 +70,18 @@ void Player::MoveEmY(GLfloat dy)
 {
     gY += dy;
     if(dy > 0)
-        gThetaPerna = (gThetaPerna + 1)%180;
+        gThetaPerna = (gThetaPerna + 1);
     if(dy < 0)
-        gThetaPerna = (gThetaPerna - 1)%180;
+        gThetaPerna = (gThetaPerna - 1);
 }
 
+//Funcao para teste, verificava a rotacao da arma
 void Player::MoveAngulo(GLfloat da){
     // if(gTheta<=30 && gTheta>=-30)
         gTheta+= da;
 }
 
+//Funcao que altera o angulo da arma do personagem
 void Player::SetAngulo(GLfloat x, GLfloat y){
     GLfloat dx,dy, angulo;
     dx = x - gX - 1.25 * radiusHead;
@@ -99,6 +101,7 @@ static void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfl
     yOut = x * sin(angleRad) + y * cos(angleRad);
 }
 
+//Funcao que cria um tiro e faz o personagem atirar
 Tiro* Player::Atira()
 {  
     GLfloat x, y, yFinal, xFinal, xBaseFinal, yBaseFinal,dx, dy;
@@ -116,6 +119,7 @@ Tiro* Player::Atira()
     return disparo;
 }
 
+//Fucao que verifica se o personagem foi atingido por um barril
 bool Player::AtingidoBarril(Inimigo * barril){
     GLfloat dist, dX, dY, xMin, yMin;
     dX = abs(gX - barril->ObtemX());
@@ -141,6 +145,7 @@ bool Player::AtingidoBarril(Inimigo * barril){
     return false;
 }
 
+//Fucao que verifica se o personagem foi atingido por um tiro
 bool Player::AtingidoTiro(Tiro *tiro)
 {
     GLfloat tiroX, tiroY, dist;

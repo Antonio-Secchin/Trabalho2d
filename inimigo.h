@@ -11,6 +11,7 @@ class Inimigo {
     GLfloat gX; 
     GLfloat gY;
     GLfloat gTheta;
+    GLint gThetaPerna;
     GLfloat widht;
     GLfloat height;
     GLint radiusHead;
@@ -41,6 +42,7 @@ public:
         hasSniper = rand()%2;
         velocidadeTiro = veloTiro;
         cooldownTiro = 0;
+        gThetaPerna = 0;
     };
     void Desenha(){ 
         DesenhaInimigo(gX, gY, gTheta);

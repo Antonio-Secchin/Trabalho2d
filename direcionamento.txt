@@ -15,4 +15,4 @@
 15. fazer o contador de retangulo \\Feito
 16. fazer a perna se mover \\Feito
 17. ajustar pra ter o mesmo tempo (frames) em diferentes computadores. \\Feito
-18. fazer o jogador atirar mais de um tiro;
+18. fazer o jogador atirar mais de um tiro; \\Feito

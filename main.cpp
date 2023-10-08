@@ -20,19 +20,33 @@ using namespace std;
 //Key status
 int keyStatus[256];
 
+//Posicao do mouse
 GLfloat MouseX = 0, MouseY = 0;
 
 // Window dimensions
 GLint Width;
 GLint Height;
 
-
+//Variaveis relacionadas ao barril
 GLint WidthBarril;
 GLint HeightBarril;
-GLint RaioCabecaPer;
+GLfloat VelocidadeBarril;
+GLint TirosNecessa;
+
+//Variaveis relacionadas ao inimigo
 GLint RaioCabecaIni;
 GLfloat VelocidadeTiroIni;
+GLfloat FrequenciaTiroIni;
 
+//Variaveis relacionadas ao personagem
+GLint RaioCabecaPer;
+GLfloat VelocidadePer;
+
+//Variaveis de configuracao
+int InimigoSpawna;
+int InimigoAtira;
+
+//Variaveis para realizar a impressao na tela
 static char str[1000];
 int BarrilNec;
 GLdouble contSpawnIni = 0;
@@ -49,17 +63,15 @@ Arena arena(0,0);
 
 Player player(0,0,0);
 
-list<Inimigo*> listaEnemy{};
+//Listas para tratar os casos que tem mais de um do mesmo objeto na tela
 
-//Para teste:
-//Inimigo * inimigo = NULL;
+list<Inimigo*> listaEnemy{};
 
 list<Tiro*> listaTiroEnemy{};
 
-Tiro * tiro = NULL;
+list<Tiro*> listaTiroAliado{};
 
-//Tiro * tiroIni = NULL;
-
+//Imprime a quantidade de barris que faltam para o jogo acabar
 void ImprimeBarrilNec(GLfloat x, GLfloat y)
 {
     glColor3f(1.0, 1.0, 1.0);
@@ -76,6 +88,7 @@ void ImprimeBarrilNec(GLfloat x, GLfloat y)
     }
 }
 
+//Imprime o texto de vitoria
 void ImprimeVitoria(GLfloat x, GLfloat y)
 {
     glColor3f(1.0, 1.0, 1.0);
@@ -92,6 +105,7 @@ void ImprimeVitoria(GLfloat x, GLfloat y)
     }
 }
 
+//Imprime o texto de derrota
 void ImprimeDerrota(GLfloat x, GLfloat y)
 {
     glColor3f(1.0, 1.0, 1.0);
@@ -108,6 +122,7 @@ void ImprimeDerrota(GLfloat x, GLfloat y)
     }
 }
 
+//Pega a posicao do mouse e coloca ela no nosso sistema de cordenadas
 void passiveMotion(int x, int y){
 
     MouseX = x - Width/2;
@@ -115,7 +130,7 @@ void passiveMotion(int x, int y){
 
 }
 
-
+//Renderiza a cena
 void renderScene(void)
 {
     // Clear the screen.
@@ -157,22 +172,23 @@ void renderScene(void)
         }
     }
     
-    if (!listaEnemy.empty()) {
+    if (!listaTiroEnemy.empty()) {
         for(Tiro * tiroIni :  listaTiroEnemy){
             if(tiroIni) tiroIni->Desenha();
         }
     }
-
-    if (tiro) tiro->Desenha();
+    if (!listaTiroAliado.empty()) {
+        for(Tiro * tiro :  listaTiroAliado){
+            if (tiro) tiro->Desenha();
+        }
+    }
 
     ImprimeBarrilNec(Width/2 -100, Height/2 - 15);
-     
-     //alvo.Desenha();
 
      glutSwapBuffers(); // Desenha the new frame of the game.
 }
 
-
+//Verifica se uma tecla foi pressionada
 void keyPress(unsigned char key, int x, int y)
 {
     switch (key)
@@ -199,14 +215,14 @@ void keyPress(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
-
+//Capta quando uma tecla para de ser pressionada
 void keyup(unsigned char key, int x, int y)
 {
     keyStatus[(int)(key)] = 0;
     glutPostRedisplay();
 }
 
-
+//Reinicia todas as teclas do teclado
 void ResetKeyStatus()
 {
     int i;
@@ -215,21 +231,22 @@ void ResetKeyStatus()
        keyStatus[i] = 0; 
 }
 
-
+//funcao que detecta se o botao esquerdo do mouse foi clicado
 void mouse(int button, int state, int x, int y){
-    //Corrige a posicao do mouse para a posicao da janela de visualizacao
 
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-        if (!tiro){
+        if (listaTiroAliado.size()< TirosNecessa*2){
+                Tiro * tiro;
                 tiro = player.Atira();
                 tiro->SetLimite(Height,Width);
+                listaTiroAliado.push_back(tiro);
              }
     }
 
 }
 
 
-
+//Funcao de inicializacao
 void init(void)
 {
     ResetKeyStatus();
@@ -262,34 +279,34 @@ void idle(void)
     previousTime = currentTime;
     //for(int i = 0; i < 90000000; i++);
 
-    double inc = INC_KEYIDLE;
+    //double inc = INC_KEYIDLE;
 
-    contSpawnIni += inc*timeDiference;
+    contSpawnIni += VelocidadeBarril*timeDiference;
 
-    if(contSpawnIni>=HeightBarril * 1.5){
+    if(InimigoSpawna && contSpawnIni>=HeightBarril * 1.5){
         contSpawnIni = 0;
-        //listaEnemy.push_back(new Inimigo(rand()%(Width - WidthBarril/2) - Width/2, Height/2 - HeightBarril/2, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni));
+        listaEnemy.push_back(new Inimigo(rand()%(Width - WidthBarril/2) - Width/2, Height/2 - HeightBarril/2, RaioCabecaIni, TirosNecessa, WidthBarril, HeightBarril, VelocidadeTiroIni));
     }
 
     //Treat keyPress
     if(keyStatus[(int)('a')] && player.ObtemX() - RaioCabecaPer > -Width/2)
     {
-        player.MoveEmX(-inc * timeDiference);
+        player.MoveEmX(-VelocidadePer * timeDiference);
         //player.MoveAngulo(-inc);
     }
     if(keyStatus[(int)('d')] && player.ObtemX() + RaioCabecaPer < Width/2)
     {
-        player.MoveEmX(inc * timeDiference);
+        player.MoveEmX(VelocidadePer * timeDiference);
         //player.MoveAngulo(inc);
     }
 
     if(keyStatus[(int)('s')] && player.ObtemY() - RaioCabecaPer > -Height/2)
     {
-        player.MoveEmY(-inc * timeDiference);
+        player.MoveEmY(-VelocidadePer * timeDiference);
     }
     if(keyStatus[(int)('w')] && player.ObtemY() + RaioCabecaPer < 0)
     {
-        player.MoveEmY(inc * timeDiference);
+        player.MoveEmY(VelocidadePer * timeDiference);
     }
 
     player.SetAngulo(MouseX,MouseY);
@@ -297,9 +314,9 @@ void idle(void)
     if (!listaEnemy.empty()) {
         for(Inimigo * inimigo :  listaEnemy){
             if(inimigo){
-                inimigo->MoveEmY(-inc * timeDiference);
+                inimigo->MoveEmY(-VelocidadeBarril * timeDiference);
                 inimigo->IncrementaCooldownTiro(timeDiference);
-                if(inimigo->HasSniper() && inimigo->SetAngulo(player.ObtemX(), player.ObtemY()) && inimigo->ObtemCooldownTiro()>1200){
+                if(InimigoAtira &&inimigo->HasSniper() && inimigo->SetAngulo(player.ObtemX(), player.ObtemY()) && inimigo->ObtemCooldownTiro()>=FrequenciaTiroIni){
                     Tiro * tiroIni = inimigo->Atira();
                     tiroIni->SetLimite(Height,Width);
                     listaTiroEnemy.push_back(tiroIni);
@@ -311,7 +328,7 @@ void idle(void)
         }
     }
 
-    if (!listaEnemy.empty()) {
+    if (!listaTiroEnemy.empty()) {
         list<Tiro*> aux{};
         for(Tiro * tiroIni :  listaTiroEnemy){
             if(tiroIni){
@@ -325,43 +342,48 @@ void idle(void)
                 }
             }
         }
-        auto inicio = aux.begin();
 
         // Percorrer a lista com um loop while
-        while (inicio != aux.end()) {
-            Tiro* tiroIni = *inicio;
-            ++inicio;
+        for (Tiro * tiroIni : aux) {
             listaTiroEnemy.remove(tiroIni);
             delete tiroIni;
         }
     }
     //Poderia usar uma lista para tratar varios tiros
-    if(tiro){
-        tiro->Move(timeDiference);
+    
+    if (!listaTiroAliado.empty()) {
+        list<Tiro*> tirosParaRemover;
+        for(Tiro * tiro :  listaTiroAliado){
+            if(tiro){
+                tiro->Move(timeDiference);
 
-        //Trata colisao
-        if (!listaEnemy.empty()) {
-            for(Inimigo * inimigo :  listaEnemy){
-                if(inimigo){
-                    if (tiro && inimigo->Atingido(tiro)){
-                        if(inimigo->GetVida() == 0){
-                            BarrilNec--;
-                            listaEnemy.remove(inimigo);
-                            delete inimigo;
-                            inimigo = NULL;
-                            break;
+                //Trata colisao
+                if (!listaEnemy.empty()) {
+                    for(Inimigo * inimigo :  listaEnemy){
+                        if(inimigo){
+                            if (tiro && inimigo->Atingido(tiro)){
+                                if(inimigo->GetVida() == 0){
+                                    BarrilNec--;
+                                    listaEnemy.remove(inimigo);
+                                    delete inimigo;
+                                    inimigo = NULL;
+                                }
+                                tirosParaRemover.push_back(tiro);
+                                break;
+                            }
                         }
-                        delete tiro;                
-                        tiro = NULL;
-                        break;
                     }
+                }
+
+                if (tiro && !tiro->Valido()) {
+                    tirosParaRemover.push_back(tiro);
                 }
             }
         }
 
-        if (tiro && !tiro->Valido()){ 
+        for (Tiro* tiro : tirosParaRemover) {
+            listaTiroAliado.remove(tiro);
             delete tiro;
-            tiro = NULL;
         }
     }
     
@@ -379,20 +401,30 @@ int main(int argc, char *argv[])
         TiXmlElement* jogador  = root->FirstChildElement("jogador");
         TiXmlElement* inimigo  = root->FirstChildElement("inimigo");
         TiXmlElement* barril  = root->FirstChildElement("barril");
+        TiXmlElement* conf  = root->FirstChildElement("configuracoes");
         if(arena){
             Height = atoi(arena->Attribute("altura"));
             Width = atoi(arena->Attribute("largura"));
         }
-        if(jogador)
+        if(jogador){
             RaioCabecaPer = atoi(jogador->Attribute("raioCabeca"));
+            VelocidadePer = stof(jogador->Attribute("velocidade"));
+        }
         if(inimigo){
             RaioCabecaIni = atoi(inimigo->Attribute("raioCabeca"));
-            VelocidadeTiroIni = (GLfloat)atoi(inimigo->Attribute("velocidadeTiro"))/100;
+            VelocidadeTiroIni = stof(inimigo->Attribute("velocidadeTiro"));
+            FrequenciaTiroIni = 1000/stof(inimigo->Attribute("tirosPorSegundo"));
         }
         if(barril){
             HeightBarril = atoi(barril->Attribute("altura"));
             WidthBarril = atoi(barril->Attribute("largura"));
             BarrilNec = atoi(barril->Attribute("nParaGanhar"));
+            TirosNecessa = atoi(barril->Attribute("numeroTiros"));
+            VelocidadeBarril = stof(barril->Attribute("velocidade"));
+        }
+        if(conf){
+            InimigoSpawna = atoi(conf->Attribute("spawnInimigos"));
+            InimigoAtira = atoi(conf->Attribute("atirarInimigos"));
         }
     }
     } else {
@@ -402,10 +434,6 @@ int main(int argc, char *argv[])
     arena = Arena(Height, Width);
 
     player = Player(RaioCabecaPer, 0, (-Height/2) + RaioCabecaPer);
-
-    //listaEnemy.push_front(new Inimigo(0, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni));
-
-    //listaEnemy.push_front(new Inimigo(200, Height/2 - HeightBarril, RaioCabecaIni, 5, WidthBarril, HeightBarril, VelocidadeTiroIni));
 
     
     // Initialize openGL with Double buffer and RGB color without transparency.

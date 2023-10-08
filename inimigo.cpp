@@ -50,8 +50,11 @@ void Inimigo::DesenhaPernas(GLfloat x, GLfloat y)
 {
     glPushMatrix();
     glTranslatef(x,y,0);
+    glRotatef(gThetaPerna, 1, 0, 0);
     DesenhaRect(-1.2 * radiusHead, - radiusHead/4, 0, 0, 0);
+    glRotatef(-gThetaPerna, 1, 0, 0);
     glTranslatef(-2*x,y,0);
+    glRotatef(gThetaPerna, 1, 0, 0);
     DesenhaRect(1.2 * radiusHead, + radiusHead/4, 0, 0, 0);
     glPopMatrix();
 }
@@ -70,6 +73,7 @@ void Inimigo::DesenhaInimigo(GLfloat x, GLfloat y, GLfloat theta)
     glPopMatrix();
 }
 
+//Funcao que desenha o texto de quantas vidas tem o barril
 void Inimigo::DesenhaVida(GLint x, GLint y, GLfloat R, GLfloat G, GLfloat B){
     glPushMatrix();
     glTranslatef(x,y,0);
@@ -92,13 +96,14 @@ void Inimigo::DesenhaVida(GLint x, GLint y, GLfloat R, GLfloat G, GLfloat B){
 void Inimigo::MoveEmY(GLfloat dy)
 {
     gY += dy;
+    gThetaPerna = (gThetaPerna + 1);
 }
 
 GLint Inimigo::GetVida(){
     return vida;
 }
 
-
+//Fucao que verifica se o inimigo foi atingido por um tiro
 bool Inimigo::Atingido(Tiro *tiro){
     GLfloat tiroX, tiroY, dist;
     tiro->GetPos(tiroX, tiroY);
@@ -109,12 +114,14 @@ bool Inimigo::Atingido(Tiro *tiro){
     return false;
 }
 
+//Funcao auxiliar de rotacao
 static void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yOut){
     GLfloat angleRad = 2 * M_PI * angle / 360;
     xOut = x * cos(angleRad) - y * sin(angleRad);
     yOut = x * sin(angleRad) + y * cos(angleRad);
 }
 
+//Funcao que calcula o angulo e verifica se muda o angulo e retorna se foi alterado ou nao
 bool Inimigo::SetAngulo(GLfloat x, GLfloat y){
     GLfloat dx,dy, angulo;
     dx = -(x - gX - 1.25 * radiusHead);
@@ -129,6 +136,7 @@ bool Inimigo::SetAngulo(GLfloat x, GLfloat y){
     return false;
 }
 
+//Funcao que cria um tiro e faz o inimigo atirar
 Tiro* Inimigo::Atira()
 {
     GLfloat x, y, yFinal, xFinal, xBaseFinal, yBaseFinal,dx, dy;
