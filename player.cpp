@@ -70,9 +70,9 @@ void Player::MoveEmY(GLfloat dy)
 {
     gY += dy;
     if(dy > 0)
-        gThetaPerna = (gThetaPerna + 1);
+        gThetaPerna = (gThetaPerna + 2);
     if(dy < 0)
-        gThetaPerna = (gThetaPerna - 1);
+        gThetaPerna = (gThetaPerna - 2);
 }
 
 //Funcao para teste, verificava a rotacao da arma
@@ -84,6 +84,8 @@ void Player::MoveAngulo(GLfloat da){
 //Funcao que altera o angulo da arma do personagem
 void Player::SetAngulo(GLfloat x, GLfloat y){
     GLfloat dx,dy, angulo;
+    if(y < gY + 0.5 * radiusHead)
+        return;
     dx = x - gX - 1.25 * radiusHead;
     dy = y - gY + 2* radiusHead;
     angulo = atan2(dy,dx) * (180.0 / M_PI);

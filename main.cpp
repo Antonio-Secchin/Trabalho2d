@@ -45,6 +45,7 @@ GLfloat VelocidadePer;
 //Variaveis de configuracao
 int InimigoSpawna;
 int InimigoAtira;
+int LimiteTela;
 
 //Variaveis para realizar a impressao na tela
 static char str[1000];
@@ -285,7 +286,10 @@ void idle(void)
 
     if(InimigoSpawna && contSpawnIni>=HeightBarril * 1.5){
         contSpawnIni = 0;
-        listaEnemy.push_back(new Inimigo(rand()%(Width - WidthBarril/2) - Width/2, Height/2 - HeightBarril/2, RaioCabecaIni, TirosNecessa, WidthBarril, HeightBarril, VelocidadeTiroIni));
+        GLfloat posX = rand()%(Width - WidthBarril/2) - Width/2;
+        if(posX< -Width/2 + WidthBarril/2)
+            posX = -Width/2 + WidthBarril/2;
+        listaEnemy.push_back(new Inimigo(posX, Height/2 - HeightBarril/2, RaioCabecaIni, TirosNecessa, WidthBarril, HeightBarril, VelocidadeTiroIni));
     }
 
     //Treat keyPress
@@ -304,7 +308,7 @@ void idle(void)
     {
         player.MoveEmY(-VelocidadePer * timeDiference);
     }
-    if(keyStatus[(int)('w')] && player.ObtemY() + RaioCabecaPer < 0)
+    if(keyStatus[(int)('w')] && (player.ObtemY() + RaioCabecaPer < 0 || !LimiteTela))
     {
         player.MoveEmY(VelocidadePer * timeDiference);
     }
@@ -425,6 +429,7 @@ int main(int argc, char *argv[])
         if(conf){
             InimigoSpawna = atoi(conf->Attribute("spawnInimigos"));
             InimigoAtira = atoi(conf->Attribute("atirarInimigos"));
+            LimiteTela = atoi(conf->Attribute("LimiteDaTela"));
         }
     }
     } else {
